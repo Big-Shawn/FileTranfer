@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bufio"
+	"fmt"
 	"io"
 	"io/fs"
 	"io/ioutil"
@@ -13,7 +15,7 @@ func main() {
 	host := "127.0.0.1:8088"
 	connection := buildConnection(host)
 
-	path := "/home/shawn/clienFile"
+	path := "C:\\Users\\shawn\\Desktop\\github\\FileTranfer\\test\\client"
 	info, _ := getDirInfo(path)
 
 	// 考虑多个文件同时传输时的问题，即传输的文件名可能和文件内容不一致时的情况
@@ -43,9 +45,13 @@ func main() {
 
 	for _, file := range info {
 		filePath, name := readFile(file, path)
+		fmt.Println(filePath)
+		fmt.Println(name)
 		send(connection, []byte(name))
 		sendFile(filePath, connection)
 	}
+
+	defer connection.Close()
 
 }
 
@@ -72,13 +78,13 @@ func readFile(file fs.FileInfo, path string) (filePath, fileName string) {
 	if file.IsDir() {
 		panic(file.Name() + " is a dir")
 	}
-	if suffix := strings.HasSuffix(path, "/"); !suffix {
-		path += "/"
+	if suffix := strings.HasSuffix(path, "\\"); !suffix {
+		path += "\\"
 	}
 
 	filePath = path + file.Name()
 
-	return filePath, fileName
+	return filePath, file.Name()
 }
 
 func send(target io.Writer, content []byte) {
@@ -97,9 +103,13 @@ func sendFile(filePath string, connection net.Conn) {
 	}
 	for {
 		readBuffer := make([]byte, 2048)
-		n, err := open.Read(readBuffer)
+		reader := bufio.NewReader(open)
+		n, err := reader.Read(readBuffer)
+		//n, err := open.Read(readBuffer)
+		// todo
 		if err != nil {
 			if err == io.EOF {
+				send(connection, []byte("done"))
 				break
 			}
 			panic("File Read err : " + err.Error())
