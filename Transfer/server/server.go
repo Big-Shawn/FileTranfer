@@ -9,7 +9,6 @@ import (
 )
 
 func main() {
-
 	host := "127.0.0.1:8088"
 	server := buildServer(host)
 	targetPath := "C:\\Users\\shawn\\Desktop\\github\\FileTranfer\\test\\server"
