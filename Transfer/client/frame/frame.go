@@ -12,6 +12,7 @@ func (f *Frame) getFrames(receive []byte) [][]byte {
 }
 
 func (f *Frame) Get() {
+	//
 
 }
 

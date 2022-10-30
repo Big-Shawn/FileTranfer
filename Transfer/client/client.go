@@ -30,4 +30,6 @@ func main() {
 		buf.Send()
 	}
 
+	// write to server -- transfer the file
+
 }

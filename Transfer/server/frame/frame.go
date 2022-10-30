@@ -10,3 +10,6 @@ func (f *Frame) getFrames(receive []byte) [][]byte {
 	return nil
 
 }
+func SendHeader(len int) {
+
+}
