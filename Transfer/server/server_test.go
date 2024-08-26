@@ -10,7 +10,7 @@ import (
 func Test_resolveConnection(t *testing.T) {
 	f := frame.Frame{
 		Type:     0,
-		Length:   0,
+		Size:     0,
 		Body:     nil,
 		Reserved: nil,
 	}
@@ -27,5 +27,5 @@ func Test_resolveConnection(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("%d, %s, %d", nf.Type, nf.Body, nf.Length)
+	fmt.Printf("%d, %s, %d", nf.Type, nf.Body, nf.Size)
 }

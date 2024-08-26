@@ -2,22 +2,28 @@ package main
 
 import (
 	"google.golang.org/protobuf/proto"
-	"io"
 	"iproto/frame"
 	"log"
 	"net"
-	"os"
+	"server/cache"
 )
 
 const PackageSize = 2048
 const ClientReady = "ready"
 const ServerDone = "done"
-const FilePath = ""
+
+// const FilePath = "file.txt"
+const FilePath = "/Users/big-shawn/Downloads/Telegram Lite/example_video.mp4"
 
 func main() {
 	host := "127.0.0.1:8879"
 	listen, err := net.Listen("tcp", host)
 	if err != nil {
+		panic(err)
+	}
+
+	// 缓存将要发送的文件信息
+	if err = cache.LoadFiles(FilePath); err != nil {
 		panic(err)
 	}
 
@@ -58,31 +64,23 @@ func readFrame(conn *net.Conn) (*frame.Frame, error) {
 func resolveConnection(conn *net.Conn) {
 	defer (*conn).Close()
 
-	open, err := os.Open(FilePath)
-	if err != nil {
-		log.Printf("open file err: %s\n", err)
-		return
+	for _, f := range cache.Files {
+		SendFileInfo(conn, f.Name, f.Size)
+		SendFileData(conn, f.Content)
+		SendComplete(conn)
 	}
-	all, err := io.ReadAll(open)
-	defer open.Close()
-
-	SendFileInfo(conn, open.Name(), len(all))
-	SendFileData(conn, &all)
-	SendComplete(conn)
 
 }
 
 func SendFileInfo(conn *net.Conn, name string, size int) {
-	f := frame.Frame{
-		Type: frame.FrameType_Info,
-		Size: int32(size),
-		Body: []byte(name),
-	}
-	writePacket(conn, &f)
+	f := GetAFrame(frame.FrameType_Info)
+	f.Body = []byte(name)
+
+	writePacket(conn, f)
 }
 
 func GetAFrame(t frame.FrameType) *frame.Frame {
-	return &frame.Frame{Type: t, Size: -1}
+	return &frame.Frame{Type: t, Size: -1, Body: make([]byte, 1), Reserved: make([]byte, 1)}
 }
 
 func SendFileData(conn *net.Conn, content *[]byte) {
@@ -107,18 +105,23 @@ func SendFileData(conn *net.Conn, content *[]byte) {
 }
 
 func SendComplete(conn *net.Conn) {
-	f := frame.Frame{
-		Type: frame.FrameType_Conn,
-		Size: -1,
-		Body: []byte(ServerDone),
-	}
-	writePacket(conn, &f)
+	f := GetAFrame(frame.FrameType_Conn)
+	f.Body = []byte(ServerDone)
+	writePacket(conn, f)
 }
 
 func writePacket(conn *net.Conn, f *frame.Frame) {
-	e := make([]byte, PackageSize-proto.Size(f))
-	f.Reserved = e
-	n, err := (*conn).Write(e)
+	log.Printf("full size : %d", proto.Size(f))
+	if n := PackageSize - proto.Size(f); n > 0 {
+		e := make([]byte, n)
+		f.Reserved = e
+	}
+
+	marshal, err2 := proto.Marshal(f)
+	if err2 != nil {
+		log.Printf("marshal err : %s\n", err2)
+	}
+	n, err := (*conn).Write(marshal)
 	if err != nil {
 		log.Printf("write to conn err: %s\n", err)
 	}
