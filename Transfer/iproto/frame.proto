@@ -1,0 +1,16 @@
+syntax = "proto3";
+option go_package="iproto/frame";
+
+enum FrameType {
+  Empty = 0;
+  Info = 1;
+  Data = 2;
+  Conn = 3;
+}
+
+message Frame {
+  FrameType type = 1;
+  sfixed32 size =2;
+  bytes body = 3;
+  bytes reserved = 4;
+}
