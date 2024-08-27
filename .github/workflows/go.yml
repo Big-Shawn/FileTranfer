@@ -71,7 +71,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GOACTION }}
       with:
-        upload_url: ${{ steps.latest_release_info.outputs.upload_url }}
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./filetransfer-${{ matrix.goos }}-${{ matrix.goarch }}.tgz
         asset_name: filetransfer-${{ matrix.goos }}-${{ matrix.goarch }}.tgz
         asset_content_type: application/gzip
