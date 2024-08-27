@@ -21,10 +21,11 @@ jobs:
       with:
         go-version: '1.20'
     - name: install server dependency
-      run: go get ./server/
+      with:   
+        cache-dependency-path: server/go.sum
       
     - name: install client dependency
-      run: go get ./client/
+      run: go get client/
 
     - name: Build server
       run: go build -v ./server/server.go
