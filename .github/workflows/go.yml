@@ -46,14 +46,14 @@ jobs:
       run: echo "version=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
     - name: Create Release
       id: create_release
-      uses: actions/create-release@v1
+      uses: actions/create-release@latest
       env:
         GITHUB_TOKEN: ${{ secrets.GOACTION }}
       with:
         tag_name: ${{ github.ref }}
         release_name: Release ${{ github.ref }}
         draft: false
-        prerelease: true
+        prerelease: false
 #      run: echo "::set-output name=version::$(git rev-parse --short HEAD)"
 #    - name: Gets latest created release info
 #      uses: "marvinpinto/action-automatic-releases@latest"
