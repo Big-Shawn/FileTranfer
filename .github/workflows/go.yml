@@ -34,7 +34,10 @@ jobs:
       run: go env -w GO111MODULE=on
 
     - name: Build server
-      run: go build -v ./...
+      run: go build -v .server/...
+      
+    - name: Build client
+      run: go build -v ./client/...
 
 
   
