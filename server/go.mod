@@ -38,4 +38,4 @@ require (
 	golang.org/x/text v0.15.0 // indirect
 )
 
-replace iproto => ../iproto
+replace iproto => ./../iproto
