@@ -29,6 +29,9 @@ jobs:
       uses: actions/setup-go@v4
       with:
         cache-dependency-path: client/go.sum
+   
+    - name: env modify
+      run: go env -w GO111MODULE=on
 
     - name: Build server
       run: go build -v ./server/server.go
