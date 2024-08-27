@@ -10,6 +10,7 @@ import (
 	"os"
 	"path"
 	"server/log"
+	"strings"
 )
 
 const ServerDone = "done"
@@ -75,6 +76,11 @@ func (u *Unit) SendInfo() error {
 		return fmt.Errorf("SendInfo error: %v", e)
 	}
 	return nil
+}
+
+// 还是需要设置一个默认包大小，这样才能保证第一次顺利通讯
+func generateCommunicationInfo(fname string, speed int) string {
+	return strings.Join([]string{fname, fmt.Sprintf("%d", speed)}, "|")
 }
 
 func (u *Unit) getFileSlice(begin, offset int) ([]byte, int, error) {

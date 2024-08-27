@@ -9,4 +9,5 @@ port: ":8879"
 package_size: 2048
 path:
   - "file.txt"
+  - "/Users/big-shawn/Downloads/Telegram Lite/example_video.mp4"
   - "/Users/big-shawn/Desktop/文件/玄学/奇门遁甲/简易小六壬/"
