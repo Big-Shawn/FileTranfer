@@ -26,7 +26,9 @@ jobs:
         cache-dependency-path: server/go.sum
       
     - name: install client dependency
-      run: go get client/
+      uses: actions/setup-go@v4
+      with:
+        cache-dependency-path: client/go.sum
 
     - name: Build server
       run: go build -v ./server/server.go
