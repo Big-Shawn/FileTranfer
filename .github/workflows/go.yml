@@ -24,13 +24,15 @@ jobs:
             goos: linux
           - goarch: arm64
             goos: darwin
+          - goarch: arm64
+            goos: win
     # 使用checkout
     steps:
     - uses: actions/checkout@v3
     - name: Set up Go
       uses: actions/setup-go@v3
       with: 
-        go-version: '>=1.16.0'
+        go-version: '>=1.20.0'
     - run: go version
     - name: make
       run: make
@@ -38,7 +40,7 @@ jobs:
         GOOS: ${{ matrix.goos }}
         GOARCH: ${{ matrix.goarch }}            
     - name: Packaging...
-      run: tar czf nodeUpgrade-${{ matrix.goos }}-${{ matrix.goarch }}.tgz nodeUpgrade
+      run: tar czf filetransfer-${{ matrix.goos }}-${{ matrix.goarch }}.tgz server/server client/client
     - name: Get version
       id: version
       run: echo "::set-output name=version::$(git rev-parse --short HEAD)"
@@ -50,7 +52,7 @@ jobs:
           prerelease: true
           title: "Development Build"
           files: |
-            ./nodeUpgrade-${{ matrix.goos }}-${{ matrix.goarch }}.tgz              
+            ./filetransfer-${{ matrix.goos }}-${{ matrix.goarch }}.tgz              
 #     - name: Uploading assets...
 #       # if: ${{ !env.ACT }}
 #       # id: upload-release-asset 
