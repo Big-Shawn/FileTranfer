@@ -1,0 +1,12 @@
+logger:
+  level: -1
+  development: true
+  encoding : "console"
+  path:
+    - "stdout"
+    - "srv.log"
+port: ":8879"
+package_size: 2048
+path:
+  - "file.txt"
+  - "/Users/big-shawn/Desktop/文件/玄学/奇门遁甲/简易小六壬/"

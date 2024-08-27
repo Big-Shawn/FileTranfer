@@ -1,9 +1,8 @@
 package cache
 
 import (
-	"io"
 	"os"
-	path2 "path"
+	"server/log"
 )
 
 var Files []*File
@@ -12,31 +11,48 @@ type File struct {
 	Name    string
 	Size    int
 	Content *[]byte
+	Handler *os.File
 }
 
-func LoadFiles(path string) error {
-	cache, err := NewFileCache(path)
-	if err != nil {
-		return err
+func LoadFiles(path []string) {
+
+	for _, p := range path {
+		NewFileCache(p)
 	}
-	Files = append(Files, cache)
-	return nil
+
 }
 
-func NewFileCache(path string) (*File, error) {
+func generateFileCache(f *os.File) *File {
+	info, _ := f.Stat()
+	return &File{Name: info.Name(), Size: int(info.Size()), Handler: f}
+}
 
-	open, err := os.Open(path)
-	_, file := path2.Split(path)
-	defer open.Close()
-	if err != nil {
-		return nil, err
-	}
+func NewFileCache(p string) {
 
-	all, err := io.ReadAll(open)
+	dirs, err := os.ReadDir(p)
 
 	if err != nil {
-		return nil, err
+		log.L.Sugar().Errorf("load file error: %s", err)
+		f, err := os.Open(p)
+		if err == nil {
+			Files = append(Files, generateFileCache(f))
+		}
+		return
 	}
 
-	return &File{Name: file, Size: len(all), Content: &all}, nil
+	for _, dir := range dirs {
+
+		if dir.IsDir() {
+			NewFileCache(p + "/" + dir.Name())
+			continue
+		}
+		f, err := os.Open(p + "/" + dir.Name())
+		if err != nil {
+			log.L.Sugar().Errorf("load file error: %s", err)
+			continue
+		}
+		Files = append(Files, generateFileCache(f))
+
+	}
+
 }
