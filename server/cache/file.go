@@ -2,6 +2,7 @@ package cache
 
 import (
 	"os"
+	"path/filepath"
 	"server/log"
 )
 
@@ -24,7 +25,7 @@ func LoadFiles(path []string) {
 
 func generateFileCache(f *os.File) *File {
 	info, _ := f.Stat()
-	return &File{Name: info.Name(), Size: int(info.Size()), Handler: f}
+	return &File{Name: filepath.Base(info.Name()), Size: int(info.Size()), Handler: f}
 }
 
 func NewFileCache(p string) {

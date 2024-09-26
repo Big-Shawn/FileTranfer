@@ -5,6 +5,7 @@ import (
 	"google.golang.org/protobuf/proto"
 	"io"
 	"iproto/frame"
+	"log"
 	"net"
 	"os"
 )
@@ -24,9 +25,59 @@ func New(p string) *Unit {
 	return &Unit{path: p}
 }
 
+func (u *Unit) Handle(m []byte) error {
+	f := &frame.Frame{}
+	err := proto.Unmarshal(m, f)
+	if err != nil {
+		return err
+	}
+	u.f = f
+	if err := u.Landing(); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (u *Unit) Read(conn *net.Conn) error {
+	msg := make(chan []byte, 20)
+	stop := make(chan struct{})
+	defer close(msg)
+
+	go func() {
+		pkg := make([]byte, 0, PackageSize)
+		for phase := range msg {
+			available := PackageSize - len(pkg)
+
+			if len(phase) < available {
+				pkg = append(pkg, phase...)
+			} else {
+				pkg = append(pkg, phase[:available]...)
+			}
+
+			if len(pkg) == PackageSize {
+				err := u.Handle(pkg)
+				if err != nil {
+					stop <- struct{}{}
+					log.Printf("\n protobuf handle error: %s\n", err)
+					break
+				}
+				pkg = make([]byte, 0, PackageSize)
+			}
+
+			if len(phase) > available {
+				pkg = append(pkg, phase[available:]...)
+			}
+		}
+	}()
+
+	go func() {
+		<-stop
+
+		(*conn).Close()
+	}()
 
 	for {
+
 		b := make([]byte, PackageSize)
 		n, err := (*conn).Read(b)
 		if err == io.EOF {
@@ -35,15 +86,7 @@ func (u *Unit) Read(conn *net.Conn) error {
 		if err != nil {
 			return err
 		}
-		f := &frame.Frame{}
-		err = proto.Unmarshal(b[:n], f)
-		if err != nil {
-			return err
-		}
-		u.f = f
-		if err := u.Landing(); err != nil {
-			return err
-		}
+		msg <- b[:n]
 	}
 
 	return nil
