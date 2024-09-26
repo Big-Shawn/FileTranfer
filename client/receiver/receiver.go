@@ -5,7 +5,6 @@ import (
 	"google.golang.org/protobuf/proto"
 	"io"
 	"iproto/frame"
-	"log"
 	"net"
 	"os"
 )
