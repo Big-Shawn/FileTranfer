@@ -32,10 +32,10 @@ func NewFileCache(p string) {
 	dirs, err := os.ReadDir(p)
 
 	if err != nil {
-		log.L.Sugar().Errorf("load file error: %s", err)
-		f, err := os.Open(p)
-		if err == nil {
+		if f, err := os.Open(p); err == nil {
 			Files = append(Files, generateFileCache(f))
+		} else {
+			log.L.Sugar().Errorf("load file error: %s", err)
 		}
 		return
 	}

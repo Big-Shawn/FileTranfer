@@ -33,13 +33,15 @@ clean:
 build-all: clean
 	@for GOOS in $(PLATFORMS); do \
 		for GOARCH in $(ARCH); do \
-			$(GOBUILD) -C server -o $(SERVER_BINARY_NAME)-$$GOOS-$$GOARCH -v; \
+		    echo "Server Building for $$GOOS/$$GOARCH..."; \
+			GOOS=$$GOOS GOARCH=$$GOARCH $(GOBUILD) -C server -o $(SERVER_BINARY_NAME)-$$GOOS-$$GOARCH -v; \
 		done \
 	done
 
 	@for GOOS in $(PLATFORMS); do \
     		for GOARCH in $(ARCH); do \
-    			$(GOBUILD) -C client -o $(CLIENT_BINARY_NAME)-$$GOOS-$$GOARCH -v; \
+    		    echo "Client Building for $$GOOS/$$GOARCH..."; \
+    			GOOS=$$GOOS GOARCH=$$GOARCH $(GOBUILD) -C client -o $(CLIENT_BINARY_NAME)-$$GOOS-$$GOARCH -v; \
     		done \
     	done
 
