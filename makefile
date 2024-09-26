@@ -34,7 +34,7 @@ build-all: clean
 	@for GOOS in $(PLATFORMS); do \
 		for GOARCH in $(ARCH); do \
 		    echo "Server Building for $$GOOS/$$GOARCH..."; \
-		    if [ "$$GOOS" == "windows" ]; then \
+		    if [ "$$GOOS" = "windows" ]; then \
 			GOOS=$$GOOS GOARCH=$$GOARCH $(GOBUILD) -C server -o $(SERVER_BINARY_NAME)-$$GOOS-$$GOARCH.exe -v; \
 		    else \
 			GOOS=$$GOOS GOARCH=$$GOARCH $(GOBUILD) -C server -o $(SERVER_BINARY_NAME)-$$GOOS-$$GOARCH -v; \
@@ -45,7 +45,7 @@ build-all: clean
 	@for GOOS in $(PLATFORMS); do \
     		for GOARCH in $(ARCH); do \
     		    echo "Client Building for $$GOOS/$$GOARCH..."; \
-    		    if [ "$$GOOS" == "windows" ]; then \
+    		    if [ "$$GOOS" = "windows" ]; then \
     			GOOS=$$GOOS GOARCH=$$GOARCH $(GOBUILD) -C client -o $(CLIENT_BINARY_NAME)-$$GOOS-$$GOARCH.exe -v; \
     			else \
     			GOOS=$$GOOS GOARCH=$$GOARCH $(GOBUILD) -C client -o $(CLIENT_BINARY_NAME)-$$GOOS-$$GOARCH -v; \
