@@ -24,8 +24,8 @@ test:
 
 clean:
 	$(GOCLEAN)
-	rm -f $(SERVER_BINARY_NAME)
-	rm -f $(CLIENT_BINARY_NAME)
+	rm -f ./server/$(SERVER_BINARY_NAME)*
+	rm -f ./client/$(CLIENT_BINARY_NAME)*
 
 .PHONY: all build test clean
 
@@ -34,14 +34,22 @@ build-all: clean
 	@for GOOS in $(PLATFORMS); do \
 		for GOARCH in $(ARCH); do \
 		    echo "Server Building for $$GOOS/$$GOARCH..."; \
+		    if [[ "$$GOOS" == "windows" ]]; then \
+			GOOS=$$GOOS GOARCH=$$GOARCH $(GOBUILD) -C server -o $(SERVER_BINARY_NAME)-$$GOOS-$$GOARCH.exe -v; \
+		    else \
 			GOOS=$$GOOS GOARCH=$$GOARCH $(GOBUILD) -C server -o $(SERVER_BINARY_NAME)-$$GOOS-$$GOARCH -v; \
+            fi \
 		done \
 	done
 
 	@for GOOS in $(PLATFORMS); do \
     		for GOARCH in $(ARCH); do \
     		    echo "Client Building for $$GOOS/$$GOARCH..."; \
+    		    if [[ "$$GOOS" == "windows" ]]; then \
+    			GOOS=$$GOOS GOARCH=$$GOARCH $(GOBUILD) -C client -o $(CLIENT_BINARY_NAME)-$$GOOS-$$GOARCH.exe -v; \
+    			else \
     			GOOS=$$GOOS GOARCH=$$GOARCH $(GOBUILD) -C client -o $(CLIENT_BINARY_NAME)-$$GOOS-$$GOARCH -v; \
+    		    fi \
     		done \
     	done
 
