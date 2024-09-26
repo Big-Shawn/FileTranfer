@@ -39,8 +39,9 @@ func (u *Unit) Handle(m []byte) error {
 }
 
 func (u *Unit) Read(conn *net.Conn) error {
-	msg := make(chan []byte, 20)
-	stop := make(chan struct{})
+	msg := make(chan []byte, 100)
+	stop := make(chan error)
+	defer (*conn).Close()
 	defer close(msg)
 
 	go func() {
@@ -57,8 +58,7 @@ func (u *Unit) Read(conn *net.Conn) error {
 			if len(pkg) == PackageSize {
 				err := u.Handle(pkg)
 				if err != nil {
-					stop <- struct{}{}
-					log.Printf("\n protobuf handle error: %s\n", err)
+					stop <- err
 					break
 				}
 				pkg = make([]byte, 0, PackageSize)
@@ -68,12 +68,6 @@ func (u *Unit) Read(conn *net.Conn) error {
 				pkg = append(pkg, phase[available:]...)
 			}
 		}
-	}()
-
-	go func() {
-		<-stop
-
-		(*conn).Close()
 	}()
 
 	for {
@@ -86,7 +80,13 @@ func (u *Unit) Read(conn *net.Conn) error {
 		if err != nil {
 			return err
 		}
-		msg <- b[:n]
+		select {
+		case e := <-stop:
+			return e
+		case msg <- b[:n]:
+			{
+			}
+		}
 	}
 
 	return nil
