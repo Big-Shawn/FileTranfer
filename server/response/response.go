@@ -95,7 +95,7 @@ func (u *Unit) SendData() error {
 	space := PackageSize - proto.Size(u.f)
 	for {
 		slice, i, err := u.getFileSlice(sent, space)
-		if err == io.EOF {
+		if err == io.EOF && i == 0 {
 			break
 		}
 
