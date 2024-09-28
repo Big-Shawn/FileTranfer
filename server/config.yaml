@@ -6,7 +6,7 @@ logger:
     - "stdout"
     - "srv.log"
 port: ":8879"
-package_size: 2048
+package_size: 2290
 path:
   - "file.txt"
   - "/path/to/file"

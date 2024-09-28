@@ -14,7 +14,9 @@ import (
 )
 
 const ServerDone = "done"
-const PackageSize = 2048
+
+const PackageSize = 1460 * 2 // 当MTU=1500时 TCP最大有效负载为1460，这里取整数倍，减少读的次数。
+//const PackageSize = 2048
 
 type Unit struct {
 	f    *frame.Frame
@@ -107,6 +109,7 @@ func (u *Unit) SendData() error {
 		}
 		u.flush()
 	}
+	log.L.Sugar().Infof("file:%s, sent:%d B \n", u.file.Name(), sent)
 
 	return nil
 }

@@ -25,8 +25,6 @@ func main() {
 	// receive from server
 	r := receiver.New(path)
 	if err := r.Read(&conn); err != nil {
-		log.Printf("\nfile receive err: %s", err)
-	} else {
-		log.Printf("\nfile receive complete")
+		log.Printf("file receive err: %s \n", err)
 	}
 }
